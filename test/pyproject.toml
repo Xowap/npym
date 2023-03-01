@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "npym-test"
+version = "0.1.0"
+description = "A project to test installing dependencies via NPyM"
+authors = ["Rémy Sanchez <remy.sanchez@hyperthese.net>"]
+license = "WTFPL"
+readme = "README.md"
+packages = [{include = "npym_test"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+npm-prettier = "^2.8.4"
+npm-vue = "^3.2.47"
+
+[[tool.poetry.source]]
+name = "npym"
+url = "http://localhost:8000/back/simple/"
+default = false
+secondary = false
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,37 @@
+{% extends "pkg_trans/base.html" %}
+{% load wailer %}
+
+{% block head_end %}
+    <link rel="canonical" href="{{ distribution.npm_url }}">
+{% endblock %}
+
+{% block content %}
+    <h1>{{ distribution.python_name }}</h1>
+
+    <p class="fs-5 col-md-8">
+        Equivalent of <code>{{ distribution.js_name }}</code>
+    </p>
+
+    {% if distribution.description %}
+    <h2>Description</h2>
+
+    <p class="fs-5 col-md-8">
+        {{ distribution.description }}
+    </p>
+    {% endif %}
+
+    <h2>Versions</h2>
+
+    <ul>
+        {% for version in package_versions %}
+        <li>
+            <a
+                href="{{ version.url }}{% if version.hash %}#sha256={{ version.hash }}{% endif %}"
+                data-requires-python="&gt;=3.0,&lt=4.0"
+            >
+                {{ version.file_name }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -20,6 +20,7 @@ router.register("me", MeViewSet, basename="me")
 urlpatterns = [
     path("back/admin/", admin.site.urls),
     path("back/api/", include(router.urls)),
+    path("back/simple/", include("npym.apps.pkg_trans.urls")),
 ]
 
 if settings.DEBUG:

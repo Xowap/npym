@@ -19,7 +19,7 @@ def get_package_version() -> str:
         return "0.0.0"
 
 
-with EnvManager(ModelWDjango()) as env:
+with EnvManager(ModelWDjango(enable_storages=True)) as env:
     # ---
     # Apps
     # ---
@@ -28,6 +28,7 @@ with EnvManager(ModelWDjango()) as env:
         "drf_spectacular",
         "drf_spectacular_sidecar",
         "npym.apps.people",
+        "npym.apps.pkg_trans",
     ]
 
     # ---

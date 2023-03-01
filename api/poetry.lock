@@ -205,6 +205,46 @@ jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
 uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
+name = "boto3"
+version = "1.24.96"
+description = "The AWS SDK for Python"
+category = "main"
+optional = false
+python-versions = ">= 3.7"
+files = [
+    {file = "boto3-1.24.96-py3-none-any.whl", hash = "sha256:748c055214c629744c34c7f94bfa888733dfac0b92e1daef9c243e1391ea4f53"},
+    {file = "boto3-1.24.96.tar.gz", hash = "sha256:6b8899542cff82becceb3498a2240bf77c96def0515b0a31f7f6a9d5b92e7a3d"},
+]
+
+[package.dependencies]
+botocore = ">=1.27.96,<1.28.0"
+jmespath = ">=0.7.1,<2.0.0"
+s3transfer = ">=0.6.0,<0.7.0"
+
+[package.extras]
+crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
+
+[[package]]
+name = "botocore"
+version = "1.27.96"
+description = "Low-level, data-driven core of boto 3."
+category = "main"
+optional = false
+python-versions = ">= 3.7"
+files = [
+    {file = "botocore-1.27.96-py3-none-any.whl", hash = "sha256:e41a81a18511f2f9181b2a9ab302a55c0effecccbef846c55aad0c47bfdbefb9"},
+    {file = "botocore-1.27.96.tar.gz", hash = "sha256:fc0a13ef6042e890e361cf408759230f8574409bb51f81740d2e5d8ad5d1fbea"},
+]
+
+[package.dependencies]
+jmespath = ">=0.7.1,<2.0.0"
+python-dateutil = ">=2.1,<3.0.0"
+urllib3 = ">=1.25.4,<1.27"
+
+[package.extras]
+crt = ["awscrt (==0.14.0)"]
+
+[[package]]
 name = "cachetools"
 version = "5.3.0"
 description = "Extensible memoizing collections and decorators"
@@ -422,7 +462,7 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
 files = [
@@ -599,6 +639,29 @@ messagebird = ["messagebird"]
 twilio = ["twilio"]
 
 [[package]]
+name = "django-storages"
+version = "1.13.2"
+description = "Support for many storage backends in Django"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "django-storages-1.13.2.tar.gz", hash = "sha256:cbadd15c909ceb7247d4ffc503f12a9bec36999df8d0bef7c31e57177d512688"},
+    {file = "django_storages-1.13.2-py3-none-any.whl", hash = "sha256:31dc5a992520be571908c4c40d55d292660ece3a55b8141462b4e719aa38eab3"},
+]
+
+[package.dependencies]
+Django = ">=3.2"
+
+[package.extras]
+azure = ["azure-storage-blob (>=12.0.0)"]
+boto3 = ["boto3 (>=1.4.4)"]
+dropbox = ["dropbox (>=7.2.1)"]
+google = ["google-cloud-storage (>=1.27.0)"]
+libcloud = ["apache-libcloud"]
+sftp = ["paramiko (>=1.10.0)"]
+
+[[package]]
 name = "django-wailer"
 version = "1.0.0b4"
 description = "A Django emailing/texting utility"
@@ -689,6 +752,21 @@ files = [
 
 [package.dependencies]
 Django = ">=2.2"
+
+[[package]]
+name = "exceptiongroup"
+version = "1.1.0"
+description = "Backport of PEP 654 (exception groups)"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "exceptiongroup-1.1.0-py3-none-any.whl", hash = "sha256:327cbda3da756e2de031a3107b81ab7b3770a602c4d16ca618298c526f4bec1e"},
+    {file = "exceptiongroup-1.1.0.tar.gz", hash = "sha256:bcb67d800a4497e1b404c2dd44fca47d3b7a5e5433dbab67f96c1a685cdfdf23"},
+]
+
+[package.extras]
+test = ["pytest (>=6)"]
 
 [[package]]
 name = "executing"
@@ -824,6 +902,18 @@ files = [
 ]
 
 [[package]]
+name = "iniconfig"
+version = "2.0.0"
+description = "brain-dead simple config-ini parsing"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
+    {file = "iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
+]
+
+[[package]]
 name = "ipython"
 version = "8.10.0"
 description = "IPython: Productive Interactive Computing"
@@ -901,6 +991,93 @@ qa = ["flake8 (==3.8.3)", "mypy (==0.782)"]
 testing = ["Django (<3.1)", "attrs", "colorama", "docopt", "pytest (<7.0.0)"]
 
 [[package]]
+name = "jmespath"
+version = "1.0.1"
+description = "JSON Matching Expressions"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "jmespath-1.0.1-py3-none-any.whl", hash = "sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980"},
+    {file = "jmespath-1.0.1.tar.gz", hash = "sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe"},
+]
+
+[[package]]
+name = "json-stream"
+version = "2.2.0"
+description = "Streaming JSON encoder and decoder"
+category = "main"
+optional = false
+python-versions = "<4,>=3.5"
+files = [
+    {file = "json-stream-2.2.0.tar.gz", hash = "sha256:560eb3178891e18a9502cc7ddc6cb998ed89365766d9fec184d06d8f3558f36c"},
+    {file = "json_stream-2.2.0-py3-none-any.whl", hash = "sha256:d403cda067cbd7b823827af92efeb3c6b0ab7cd3247c1c111d8bdf2efd00ba69"},
+]
+
+[package.dependencies]
+json-stream-rs-tokenizer = ">=0.4.8"
+
+[package.extras]
+httpx = ["httpx"]
+requests = ["requests"]
+
+[[package]]
+name = "json-stream-rs-tokenizer"
+version = "0.4.15"
+description = "A faster tokenizer for the json-stream Python library"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4"
+files = [
+    {file = "json-stream-rs-tokenizer-0.4.15.tar.gz", hash = "sha256:27c99f4b0e48f661d3ee7ece9f52363ee732cbacfe6f0e413a24c8b663728636"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:0d776b6f32574b4310dee284a6064329b81439f19b23677eeb29204a38c88f0e"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:6e79bd9de85b3ff531fc7d7fb0b2c6d37ea65fdc4998b2490b5283d3897bcab1"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3291ca5f1a634ed2566b1ae0ddd27ee641ae554a7d04e2b9b7b3e738f975d207"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:42d0942a21fa83f01a13cf74c3b760dae17991810b772fdd57e911d15f276bda"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp310-cp310-win32.whl", hash = "sha256:235b28b31d694e82bb09fda9643de6c65a64947306836c6b9a970b5dc4b8d654"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp310-cp310-win_amd64.whl", hash = "sha256:92d826a6235f421ffbbbe72d9f21622aab63d786ed313098d6f7d14f00001d10"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:7b812a4326784f4627939b2efacd6ebee233e8ad460e17e816b70710401c5060"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:ee10cf262910bb6197fa47595950d0ef09cedecf742706f6a9db400a78a12def"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:38929a55c71e4e49e35c59e4ff890125e1a21a10b10a7a4751b1fc83b2b945e9"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:0fab0ce0b1dacdfb457cad6b705bbe7464afce66d86d9cfa0923762c6fec2ce8"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp311-cp311-win32.whl", hash = "sha256:7aa057aa5f17acf4e83a84752c3cd33a029442987ad4ad3073031bfd29920f82"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp311-cp311-win_amd64.whl", hash = "sha256:19cf3f403f2a0c25c8d7a45e67e5491fbde0832fae596c221d5efd94e01ecc56"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:0b98d3311b77b61ba6454eb846ff0b06689fa8bbfc51e72d98ca827e0287e686"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d4babd5120a512e56d7a618294d402256c9f1856db40ba79a5ef62a655cf3f5a"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp37-cp37m-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:1638939a06d9fe937375ab642265afdcbaa0c755417672bd7bd17c6dc0141c53"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp37-cp37m-win32.whl", hash = "sha256:0f6c0020b48e3ebc649e005cf3781e2b0655208139c099a8d0c22af01872c6ae"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp37-cp37m-win_amd64.whl", hash = "sha256:4d875331d42c71294ca9acacd04724508148f3fa6a45988a149c3ffdc33af54a"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:228f4f2a1844209d74930d1fc6548432cdd09e2fe05d1e7af53d38d0c2b16402"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:15f2fb85c78be964c6d97d6a06a59932be88bece0d2a72851d2732d3b2bcfe12"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fae3bc585d183cdaf6f4d403c23b5fffcc7110acc20719f49a19bc3fc6a3dd7c"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp38-cp38-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:0703b68f40b59ffb46c9e42b23ae7c6296b771077690460b2fd6de64986e20ef"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp38-cp38-win32.whl", hash = "sha256:d426d8a139324885f14a5c7d0652c529656b48c423433b2ece2e625d0eb63a57"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp38-cp38-win_amd64.whl", hash = "sha256:ba1f4c10ed89843dd262c1fd0752afecca46bc88f0ffa5d63ee0b45cf7b4d407"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:3bdc05bb8a8c207bc3547c33646ed7c3de5d33d8dd72e215b1e27e911251fb89"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:a2209a9ddf1340503550676da3d6178f31ea4298334598473834257a78aa055f"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:82ce170f21e0b98a35bc2733b0b3f68921315cd133cdb41375354ac1561ebc96"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp39-cp39-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:da8d53aca042b33b4dc5c130d751ad543f4b47f5a141ec82e8647a06918a71a6"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp39-cp39-win32.whl", hash = "sha256:f27f99804f84e7798cba23a6a87f821d2f628ab4d0309fda6eecab54e0b765c9"},
+    {file = "json_stream_rs_tokenizer-0.4.15-cp39-cp39-win_amd64.whl", hash = "sha256:79ddc357eb41e527e9092e62185b7ce082139bb752f88d1b70f89aa64823d8b4"},
+    {file = "json_stream_rs_tokenizer-0.4.15-pp37-pypy37_pp73-macosx_10_9_x86_64.whl", hash = "sha256:bb9730db205638a8932021570ecf822fc385bdcf439b14f311fa9e4e77fd8b05"},
+    {file = "json_stream_rs_tokenizer-0.4.15-pp37-pypy37_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b2933e9d3adca8be61cd918d2f3aff0d8d0951daf357ffb7d67377336e077c1e"},
+    {file = "json_stream_rs_tokenizer-0.4.15-pp37-pypy37_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ca2b4c6fbf7dd28268f6dad35d3181b2df4e7061ebd64fb036f6bbde56fc5062"},
+    {file = "json_stream_rs_tokenizer-0.4.15-pp37-pypy37_pp73-win_amd64.whl", hash = "sha256:5549a23d485945561590747a11eaabe557d55a505148f7bec9d1cdd3e8a7fdf4"},
+    {file = "json_stream_rs_tokenizer-0.4.15-pp38-pypy38_pp73-macosx_10_9_x86_64.whl", hash = "sha256:3ae49d9731be5d258f765b62c73c52a5fe8245643c268ff6aa8079bd24bf0d60"},
+    {file = "json_stream_rs_tokenizer-0.4.15-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3c427debb75ecef381c551d01feaeb02dbc3b8023544d8d86df1eeeb5f50a3cf"},
+    {file = "json_stream_rs_tokenizer-0.4.15-pp38-pypy38_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:cf524107b1c7039a6280856c1084835f35fa5fad94afa8736dcd9666a382ac3d"},
+    {file = "json_stream_rs_tokenizer-0.4.15-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:48a703a4528abb64804d6e8ca484bc5064d184b6941c5c0ed51b4c5208fe5e20"},
+    {file = "json_stream_rs_tokenizer-0.4.15-pp39-pypy39_pp73-macosx_10_9_x86_64.whl", hash = "sha256:14ff3c27f127ecb87c58a9a86de38bfd85bf18b19193816ecc5fab0e4de636ec"},
+    {file = "json_stream_rs_tokenizer-0.4.15-pp39-pypy39_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:06a15c5ada1890ec1957240c13b05dfc4dfcdbb8a40198bdaf7a2a20ccc74abf"},
+    {file = "json_stream_rs_tokenizer-0.4.15-pp39-pypy39_pp73-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:76bd1452d18574410a0d298419a51cc68c3e9e6c30e5ef180f6415d796766a94"},
+    {file = "json_stream_rs_tokenizer-0.4.15-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:b33c987367e67bf36998016e855541e5cb131f9dbae9d6968a3f447e290071bd"},
+]
+
+[package.extras]
+benchmark = ["contexttimer (>=0.3,<0.4)", "json-stream-to-standard-types (>=0.1,<0.2)", "si-prefix (>=1.2,<2)", "tqdm (>=4.64,<5)", "typer (>=0.6,<0.7)"]
+test = ["json-stream-rs-tokenizer[benchmark]", "pytest (>7.1,<8)"]
+
+[[package]]
 name = "jsonschema"
 version = "4.17.3"
 description = "An implementation of JSON Schema validation for Python"
@@ -919,6 +1096,23 @@ pyrsistent = ">=0.14.0,<0.17.0 || >0.17.0,<0.17.1 || >0.17.1,<0.17.2 || >0.17.2"
 [package.extras]
 format = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3987", "uri-template", "webcolors (>=1.11)"]
 format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-validator", "rfc3986-validator (>0.1.0)", "uri-template", "webcolors (>=1.11)"]
+
+[[package]]
+name = "lark"
+version = "1.1.5"
+description = "a modern parsing library"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "lark-1.1.5-py3-none-any.whl", hash = "sha256:8476f9903e93fbde4f6c327f74d79e9b4bd0ed9294c5dfa3164ab8c581b5de2a"},
+    {file = "lark-1.1.5.tar.gz", hash = "sha256:4b534eae1f9af5b4ea000bea95776350befe1981658eea3820a01c37e504bb4d"},
+]
+
+[package.extras]
+atomic-cache = ["atomicwrites"]
+nearley = ["js2py"]
+regex = ["regex"]
 
 [[package]]
 name = "lxml"
@@ -1057,10 +1251,12 @@ files = [
 ]
 
 [package.dependencies]
+boto3 = {version = ">=1.24,<1.25", optional = true, markers = "extra == \"wagtail\" or extra == \"storages\""}
 coloredlogs = ">=15.0,<15.1"
 dj-database-url = ">=0.5,<0.6"
 Django = {version = ">=4.1,<4.2", extras = ["argon2"]}
 django-postgres-extra = ">=2.0,<2.1"
+django-storages = {version = ">=1.13,<1.14", optional = true, markers = "extra == \"wagtail\" or extra == \"storages\""}
 django-wailer = ">=1.0.0-beta.2,<1.1.0"
 djangorestframework = ">=3.14,<3.15"
 djangorestframework-gis = ">=1.0,<1.1"
@@ -1106,7 +1302,7 @@ files = [
 name = "packaging"
 version = "23.0"
 description = "Core utilities for Python packages"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1196,6 +1392,22 @@ files = [
 [package.extras]
 docs = ["furo (>=2022.12.7)", "proselint (>=0.13)", "sphinx (>=6.1.3)", "sphinx-autodoc-typehints (>=1.22,!=1.23.4)"]
 test = ["appdirs (==1.4.4)", "covdefaults (>=2.2.2)", "pytest (>=7.2.1)", "pytest-cov (>=4)", "pytest-mock (>=3.10)"]
+
+[[package]]
+name = "pluggy"
+version = "1.0.0"
+description = "plugin and hook calling mechanisms for python"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3"},
+    {file = "pluggy-1.0.0.tar.gz", hash = "sha256:4224373bacce55f955a878bf9cfa763c1e360858e330072059e10bad68531159"},
+]
+
+[package.extras]
+dev = ["pre-commit", "tox"]
+testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "premailer"
@@ -1362,6 +1574,49 @@ files = [
 ]
 
 [[package]]
+name = "pytest"
+version = "7.2.1"
+description = "pytest: simple powerful testing with Python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pytest-7.2.1-py3-none-any.whl", hash = "sha256:c7c6ca206e93355074ae32f7403e8ea12163b1163c976fee7d4d84027c162be5"},
+    {file = "pytest-7.2.1.tar.gz", hash = "sha256:d45e0952f3727241918b8fd0f376f5ff6b301cc0777c6f9a556935c92d8a7d42"},
+]
+
+[package.dependencies]
+attrs = ">=19.2.0"
+colorama = {version = "*", markers = "sys_platform == \"win32\""}
+exceptiongroup = {version = ">=1.0.0rc8", markers = "python_version < \"3.11\""}
+iniconfig = "*"
+packaging = "*"
+pluggy = ">=0.12,<2.0"
+tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
+
+[package.extras]
+testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "xmlschema"]
+
+[[package]]
+name = "pytest-django"
+version = "4.5.2"
+description = "A Django plugin for pytest."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "pytest-django-4.5.2.tar.gz", hash = "sha256:d9076f759bb7c36939dbdd5ae6633c18edfc2902d1a69fdbefd2426b970ce6c2"},
+    {file = "pytest_django-4.5.2-py3-none-any.whl", hash = "sha256:c60834861933773109334fe5a53e83d1ef4828f2203a1d6a0fa9972f4f75ab3e"},
+]
+
+[package.dependencies]
+pytest = ">=5.4.0"
+
+[package.extras]
+docs = ["sphinx", "sphinx-rtd-theme"]
+testing = ["Django", "django-configurations (>=2.0)"]
+
+[[package]]
 name = "python-dateutil"
 version = "2.8.2"
 description = "Extensions to the standard Python datetime module"
@@ -1513,6 +1768,36 @@ pygments = ">=2.6.0,<3.0.0"
 jupyter = ["ipywidgets (>=7.5.1,<8.0.0)"]
 
 [[package]]
+name = "s3transfer"
+version = "0.6.0"
+description = "An Amazon S3 Transfer Manager"
+category = "main"
+optional = false
+python-versions = ">= 3.7"
+files = [
+    {file = "s3transfer-0.6.0-py3-none-any.whl", hash = "sha256:06176b74f3a15f61f1b4f25a1fc29a4429040b7647133a463da8fa5bd28d5ecd"},
+    {file = "s3transfer-0.6.0.tar.gz", hash = "sha256:2ed07d3866f523cc561bf4a00fc5535827981b117dd7876f036b0c1aca42c947"},
+]
+
+[package.dependencies]
+botocore = ">=1.12.36,<2.0a.0"
+
+[package.extras]
+crt = ["botocore[crt] (>=1.20.29,<2.0a.0)"]
+
+[[package]]
+name = "semver"
+version = "2.13.0"
+description = "Python helper for Semantic Versioning (http://semver.org/)"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+files = [
+    {file = "semver-2.13.0-py2.py3-none-any.whl", hash = "sha256:ced8b23dceb22134307c1b8abfa523da14198793d9787ac838e70e29e77458d4"},
+    {file = "semver-2.13.0.tar.gz", hash = "sha256:fa0fe2722ee1c3f57eac478820c3a5ae2f624af8264cbdf9000c980ff7f75e3f"},
+]
+
+[[package]]
 name = "sentry-sdk"
 version = "1.9.10"
 description = "Python client for Sentry (https://sentry.io)"
@@ -1625,7 +1910,7 @@ tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1715,6 +2000,18 @@ files = [
 ]
 
 [[package]]
+name = "wheel-filename"
+version = "1.4.1"
+description = "Parse wheel filenames"
+category = "main"
+optional = false
+python-versions = "~=3.6"
+files = [
+    {file = "wheel-filename-1.4.1.tar.gz", hash = "sha256:e2e1eb0780910a0148358252aad6394cc674250686c56c39aa379493438370b3"},
+    {file = "wheel_filename-1.4.1-py3-none-any.whl", hash = "sha256:a53d8ece58822eb27b3a8841c6b4bebf357f19ff0dd83ce9179756f64a4bc0df"},
+]
+
+[[package]]
 name = "whitenoise"
 version = "6.2.0"
 description = "Radically simplified static file serving for WSGI applications"
@@ -1732,4 +2029,4 @@ brotli = ["Brotli"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.10"
-content-hash = "44329dcf20358f6b58ba4c4c2d207489a301dfff4891f9f2a453eab47d12fdae"
+content-hash = "9636adb49431ffa18233bd48d87358bcc669abe70a82b6273cd794d572d837b9"

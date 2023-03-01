@@ -11,8 +11,15 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "~3.10"
-modelw-preset-django = {extras = ["gunicorn"], version = "~2023.1.0b1"}
+modelw-preset-django = {extras = ["gunicorn", "storages"], version = "~2023.1.0b1"}
 drf-spectacular = {extras = ["sidecar"], version = "^0.24.0"}
+httpx = "^0.23.3"
+pytest-django = "^4.5.2"
+json-stream = "^2.2.0"
+rich = "*"
+wheel-filename = "^1.4.1"
+semver = "^2.13.0"
+lark = "^1.1.5"
 
 [tool.poetry.dev-dependencies]
 black = "*"
