@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "npym"
+name = "npym_api"
 version = "0.1.0"
-description = ""
+description = "The API backing the NPyM service"
 authors = ["Rémy Sanchez <remy.sanchez@hyperthese.net>"]
-license = "Proprietary"
+license = "WTFPL"
 
 packages = [
-    {include = "npym"},
+    {include = "npym/api"},
 ]
 
 [tool.poetry.dependencies]

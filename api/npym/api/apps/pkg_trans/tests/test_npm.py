@@ -1,6 +1,6 @@
 import pytest
 
-from npym.apps.pkg_trans.npm import NormName, Npm, _norm_py_name
+from npym.api.apps.pkg_trans.npm import NormName, Npm, _norm_py_name
 
 
 @pytest.fixture

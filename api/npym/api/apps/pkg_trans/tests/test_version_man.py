@@ -1,7 +1,7 @@
 import pytest
 from semver import VersionInfo as SemVersion
 
-from npym.apps.pkg_trans.version_man import (
+from npym.api.apps.pkg_trans.version_man import (
     MAX_VER,
     MIN_VER,
     Bound,

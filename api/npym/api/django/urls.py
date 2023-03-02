@@ -4,7 +4,7 @@ from django.urls import include, path
 from django.utils.translation import gettext_lazy as _
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
-from npym.apps.people.views import MeViewSet
+from npym.api.apps.people.views import MeViewSet
 
 admin.site.site_title = _("npym")
 admin.site.site_header = _("npym")
@@ -20,7 +20,7 @@ router.register("me", MeViewSet, basename="me")
 urlpatterns = [
     path("back/admin/", admin.site.urls),
     path("back/api/", include(router.urls)),
-    path("back/simple/", include("npym.apps.pkg_trans.urls")),
+    path("back/simple/", include("npym.api.apps.pkg_trans.urls")),
 ]
 
 if settings.DEBUG:

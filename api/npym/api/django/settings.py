@@ -27,17 +27,17 @@ with EnvManager(ModelWDjango(enable_storages=True)) as env:
     INSTALLED_APPS = [
         "drf_spectacular",
         "drf_spectacular_sidecar",
-        "npym.apps.people",
-        "npym.apps.pkg_trans",
+        "npym.api.apps.people",
+        "npym.api.apps.pkg_trans",
     ]
 
     # ---
     # Plumbing
     # ---
 
-    ROOT_URLCONF = "npym.django.urls"
+    ROOT_URLCONF = "npym.api.django.urls"
 
-    WSGI_APPLICATION = "npym.django.wsgi.application"
+    WSGI_APPLICATION = "npym.api.django.wsgi.application"
 
     # ---
     # Auth

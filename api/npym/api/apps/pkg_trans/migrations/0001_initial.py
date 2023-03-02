@@ -2,7 +2,7 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import npym.apps.pkg_trans.models
+import npym.api.apps.pkg_trans.models
 import psqlextra.manager.manager
 import uuid
 
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 (
                     "archive",
                     models.FileField(
-                        upload_to=npym.apps.pkg_trans.models.upload_to_archive
+                        upload_to=npym.api.apps.pkg_trans.models.upload_to_archive
                     ),
                 ),
             ],

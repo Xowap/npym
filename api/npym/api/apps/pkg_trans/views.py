@@ -12,7 +12,7 @@ from packaging.version import Version as PyVersion
 from psqlextra.types import ConflictAction
 from wheel_filename import ParsedWheelFilename, parse_wheel_filename
 
-from .models import Archive, Distribution, Version, Download
+from .models import Archive, Distribution, Download, Version
 from .npm import Npm, PackageInfo, version_sem_to_py
 from .translator import PackageTranslator, file_digest
 

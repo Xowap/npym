@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand
 
-from npym.apps.pkg_trans.models import Archive
+from npym.api.apps.pkg_trans.models import Archive
 
 
 class Command(BaseCommand):

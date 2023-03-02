@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand
 
-from npym.apps.pkg_trans.npm import Npm
+from npym.api.apps.pkg_trans.npm import Npm
 
 
 class Command(BaseCommand):

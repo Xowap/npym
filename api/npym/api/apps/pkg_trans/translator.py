@@ -225,7 +225,7 @@ class PackageTranslator:
             **peer_dependencies,
         }
 
-        out = {}
+        out = {"npym": ">=0.0.0"}
         name_map = {
             d.js_name: d.python_name
             for d in Distribution.objects.filter(js_name__in=dependencies)
