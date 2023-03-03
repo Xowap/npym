@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "npym_api"
-version = "0.1.0"
+version = "1.0.0"
 description = "The API backing the NPyM service"
 authors = ["Rémy Sanchez <remy.sanchez@hyperthese.net>"]
 license = "WTFPL"
