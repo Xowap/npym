@@ -7,10 +7,10 @@ from urllib.parse import quote
 
 import httpx
 import json_stream.httpx
+from django.conf import settings
 from packaging.version import Version as PyVersion
 from psqlextra.types import ConflictAction
 from semver import VersionInfo as SemVersion
-from django.conf import settings
 
 from .iter import ChunkIterator
 from .models import Distribution

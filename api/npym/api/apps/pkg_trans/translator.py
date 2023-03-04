@@ -8,7 +8,7 @@ import zipfile
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Sequence, Mapping, Callable, TypeVar, Generic, Tuple, MutableMapping
+from typing import Callable, Generic, Mapping, MutableMapping, Sequence, Tuple, TypeVar
 
 import httpx
 
@@ -72,7 +72,7 @@ def dedup_python_key(k: str, i: int) -> str:
         Index of that key's occurrence
     """
 
-    k = re.sub(r"[^a-z0-9]+", "_", k.lower()).strip('_')
+    k = re.sub(r"[^a-z0-9]+", "_", k.lower()).strip("_")
 
     if i == 0:
         return k
@@ -80,7 +80,9 @@ def dedup_python_key(k: str, i: int) -> str:
         return f"{k}_{i}"
 
 
-def dedup_map(data: Mapping[str, T], transform: Callable[[str, int], str]) -> Mapping[str, DedupMapEntry[T]]:
+def dedup_map(
+    data: Mapping[str, T], transform: Callable[[str, int], str]
+) -> Mapping[str, DedupMapEntry[T]]:
     """
     Uses the transform function to transform all keys in the mapping. If once
     transformed, two keys are identical, then we will append a number to the
@@ -259,7 +261,9 @@ class PackageTranslator:
             if f.is_dir():
                 first_dir = f
                 shutil.copytree(
-                    self.source_dir / first_dir, self.npm_package_dir, dirs_exist_ok=True
+                    self.source_dir / first_dir,
+                    self.npm_package_dir,
+                    dirs_exist_ok=True,
                 )
 
                 break
@@ -433,13 +437,15 @@ class PackageTranslator:
 
         self._write_lines(self.dist_info_dir / "RECORD", lines)
 
-    def _guess_entry_points(self) -> Tuple[Mapping[str, DedupMapEntry], Mapping[str, str]]:
+    def _guess_entry_points(
+        self,
+    ) -> Tuple[Mapping[str, DedupMapEntry], Mapping[str, str]]:
         """
         Parsing the bin argument from package.json in order to deduce the
         expected entry points and their naming in Python.
         """
 
-        scripts = self.version_info.get('bin', {})
+        scripts = self.version_info.get("bin", {})
 
         if isinstance(scripts, str):
             scripts = {Path(self.distribution.js_name).name: scripts}
@@ -475,7 +481,7 @@ class PackageTranslator:
 
         lines = [
             "from npym import EntryPoints",
-            f"entrypoints = EntryPoints.from_json({json.dumps(kwargs)!r})"
+            f"entrypoints = EntryPoints.from_json({json.dumps(kwargs)!r})",
         ]
 
         self._write_lines(self.py_module_dir / "__init__.py", lines)
@@ -521,7 +527,9 @@ class PackageTranslator:
         lines = ["[console_scripts]"]
 
         for entry in scripts.values():
-            lines.append(f"{entry.original}={self.distribution.python_name}:entrypoints.{entry.transformed}")
+            lines.append(
+                f"{entry.original}={self.distribution.python_name}:entrypoints.{entry.transformed}"
+            )
 
         self._write_lines(self.dist_info_dir / "entry_points.txt", lines)
 
