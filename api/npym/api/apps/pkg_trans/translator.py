@@ -246,15 +246,23 @@ class PackageTranslator:
 
     def _copy_source(self):
         """
-        We copy the source from "work_dir/source/package" to the wheel
+        We copy the source from "work_dir/source/<package>" to the wheel
         by putting everything in
         "work_dir/wheel/npym/node_modules/<package_name>".
+
+        The <package> directory is the first directory found in the tarball.
         """
 
         self.npm_package_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copytree(
-            self.source_dir / "package", self.npm_package_dir, dirs_exist_ok=True
-        )
+
+        for f in self.source_dir.iterdir():
+            if f.is_dir():
+                first_dir = f
+                shutil.copytree(
+                    self.source_dir / first_dir, self.npm_package_dir, dirs_exist_ok=True
+                )
+
+                break
 
     def _write_lines(self, path: Path, lines: Sequence[str]):
         """
