@@ -10,22 +10,22 @@ __all__ = ["node_modules"]
 node_modules = Path(__file__).parent / "node_modules"
 
 
-def run_script(module: str, script: str, args: Sequence[str]) -> None:
+def run_script(package: str, script: str, args: Sequence[str]) -> None:
     """
-    Run a script from a node module. Used as an entrypoint for Python package
+    Run a script from a node package. Used as an entrypoint for Python package
     managers in order to convert Node bins into Python bins.
 
     Parameters
     ----------
-    module
-        Name of the Node module
+    package
+        Name of the Node package
     script
         Name of the script to run (relative to the Node module's dir)
     args
         Arguments to pass to the script (excluding the script name)
     """
 
-    os.execvp("node", ["node", str(node_modules / module / script), *args])
+    os.execvp("node", ["node", str(node_modules / package / script), *args])
 
 
 class EntryPoints:

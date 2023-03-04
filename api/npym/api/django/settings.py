@@ -67,3 +67,9 @@ with EnvManager(ModelWDjango(enable_storages=True)) as env:
         "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
         "REDOC_DIST": "SIDECAR",
     }
+
+    # ---
+    # Translator
+    # ---
+
+    NPYM_PREFIX = "npym"

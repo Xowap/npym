@@ -1,12 +1,14 @@
 import base64
 import hashlib
+import json
 import re
 import shutil
 import tarfile
 import zipfile
+from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Sequence
+from typing import Sequence, Mapping, Callable, TypeVar, Generic, Tuple, MutableMapping
 
 import httpx
 
@@ -41,6 +43,75 @@ def urlsafe_b64encode_nopad(data):
     """
 
     return base64.urlsafe_b64encode(data).rstrip(b"=")
+
+
+T = TypeVar("T")
+
+
+@dataclass(frozen=True)
+class DedupMapEntry(Generic[T]):
+    """
+    Output of the dedup function below
+    """
+
+    original: str
+    transformed: str
+    value: T
+
+
+def dedup_python_key(k: str, i: int) -> str:
+    """
+    Transforms a name into a Python module, used to generate entrypoints in a
+    Python-compatible way through dedup_map() below.
+
+    Parameters
+    ----------
+    k
+        Key you want to deduplicate
+    i
+        Index of that key's occurrence
+    """
+
+    k = re.sub(r"[^a-z0-9]+", "_", k.lower()).strip('_')
+
+    if i == 0:
+        return k
+    else:
+        return f"{k}_{i}"
+
+
+def dedup_map(data: Mapping[str, T], transform: Callable[[str, int], str]) -> Mapping[str, DedupMapEntry[T]]:
+    """
+    Uses the transform function to transform all keys in the mapping. If once
+    transformed, two keys are identical, then we will append a number to the
+    name. In order to figure duplicates, it will call transform(key, 0) and
+    then if duplicate there is it will call transform(key, 1) and so on.
+
+    Parameters
+    ----------
+    data
+        The mapping to deduplicate
+    transform
+        The function to transform the keys
+    """
+
+    seen = set()
+    result = {}
+
+    for key, value in data.items():
+        new_key = transform(key, 0)
+
+        if new_key in seen:
+            i = 1
+
+            while new_key in seen:
+                new_key = transform(key, i)
+                i += 1
+
+        seen.add(new_key)
+        result[new_key] = DedupMapEntry(key, new_key, value)
+
+    return result
 
 
 class PackageTranslator:
@@ -123,6 +194,18 @@ class PackageTranslator:
             raise ValueError("Invalid path")
 
         return path
+
+    @property
+    def py_module_dir(self):
+        """
+        If the package has entrypoints, they need to be put in a module. This
+        computes the location of this module.
+        """
+
+        py_module = re.sub("[^a-z0-9.]+", "_", self.distribution.python_name)
+        py_module = py_module.replace(".", "/")
+
+        return self.wheel_dir / py_module
 
     def _download_source(self):
         """
@@ -342,6 +425,109 @@ class PackageTranslator:
 
         self._write_lines(self.dist_info_dir / "RECORD", lines)
 
+    def _guess_entry_points(self) -> Tuple[Mapping[str, DedupMapEntry], Mapping[str, str]]:
+        """
+        Parsing the bin argument from package.json in order to deduce the
+        expected entry points and their naming in Python.
+        """
+
+        scripts = self.version_info.get('bin', {})
+
+        if isinstance(scripts, str):
+            scripts = {Path(self.distribution.js_name).name: scripts}
+        else:
+            scripts = {Path(k).name: v for k, v in scripts.items()}
+
+        scripts = dedup_map(scripts, dedup_python_key)
+        entrypoints: MutableMapping[str, str] = {}
+
+        for entry in scripts.values():
+            entrypoints[entry.transformed] = entry.value
+
+        return scripts, entrypoints
+
+    def _write_module_init(self, entrypoints: Mapping[str, str]):
+        """
+        We leverage npym's EntryPoints facility to minimize the amount of code
+        we need to generate here.
+
+        Parameters
+        ----------
+        entrypoints
+            The generated list of entrypoints
+        """
+
+        if not entrypoints:
+            return
+
+        kwargs = dict(
+            package=self.distribution.js_name,
+            scripts=entrypoints,
+        )
+
+        lines = [
+            "from npym import EntryPoints",
+            f"entrypoints = EntryPoints.from_json({json.dumps(kwargs)!r})"
+        ]
+
+        self._write_lines(self.py_module_dir / "__init__.py", lines)
+
+    def _write_module_main(self, entrypoints: Mapping[str, str]):
+        """
+        If there is one entrypoint, we'll allow it to be ran as a Python module
+        (for example "python -m npym.prettier"). This requires a __main__.py
+        file that we're creating here.
+
+        Parameters
+        ----------
+        entrypoints
+            Deduced entrypoints
+        """
+
+        if len(entrypoints) != 1:
+            return
+
+        lines = [
+            f"from {self.distribution.python_name} import entrypoints",
+            f"entrypoints.{[*entrypoints][0]}()",
+        ]
+
+        self._write_lines(self.py_module_dir / "__main__.py", lines)
+
+    def _write_entrypoints_txt(self, scripts: Mapping[str, DedupMapEntry]):
+        """
+        entry_points.txt indicates to the package manager which bins needs to
+        be created when the package is installed. That's where we do the
+        mapping between the name of the script as asked by JS and the name of
+        the Python function to call (which we generated earlier).
+
+        Parameters
+        ----------
+        scripts
+            Entrypoints map, generated a few steps before
+        """
+
+        if not scripts:
+            return
+
+        lines = ["[console_scripts]"]
+
+        for entry in scripts.values():
+            lines.append(f"{entry.original}={self.distribution.python_name}:entrypoints.{entry.transformed}")
+
+        self._write_lines(self.dist_info_dir / "entry_points.txt", lines)
+
+    def _write_bin(self):
+        """
+        Umbrella call for all which pertains to bin and entrypoints
+        """
+
+        self.py_module_dir.mkdir(parents=True, exist_ok=True)
+        scripts, entrypoints = self._guess_entry_points()
+        self._write_module_init(entrypoints)
+        self._write_module_main(entrypoints)
+        self._write_entrypoints_txt(scripts)
+
     def _write_dist_info(self):
         """
         Umbrella to call all the functions that will build the various files
@@ -353,6 +539,7 @@ class PackageTranslator:
         self._write_dist_info_license()
         self._write_dist_info_metadata()
         self._write_dist_info_records()
+        self._write_bin()
 
     def _zip_wheel(self):
         """

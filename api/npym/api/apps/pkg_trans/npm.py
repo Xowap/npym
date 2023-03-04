@@ -10,6 +10,7 @@ import json_stream.httpx
 from packaging.version import Version as PyVersion
 from psqlextra.types import ConflictAction
 from semver import VersionInfo as SemVersion
+from django.conf import settings
 
 from .iter import ChunkIterator
 from .models import Distribution
@@ -58,6 +59,41 @@ class NormName:
         if not self.package:
             self.package = "undefined"
 
+    def make_safe_py_name(self, name: str):
+        """
+        Makes sure that a name is safe to become a Python package name. It
+        cannot start with a number.
+
+        Parameters
+        ----------
+        name
+            Name you want to transform into a Python package
+        """
+
+        if not name:
+            return name
+
+        if name[0].isdigit():
+            name = f"n{name}"
+
+        return name
+
+    @property
+    def safe_org(self):
+        """
+        An org name that can be a valid package name
+        """
+
+        return self.make_safe_py_name(self.org)
+
+    @property
+    def safe_package(self):
+        """
+        A Node package name that can be a valid Python package name
+        """
+
+        return self.make_safe_py_name(self.package)
+
     @property
     def py_name(self):
         """
@@ -66,9 +102,9 @@ class NormName:
         """
 
         if self.org:
-            return f"npm.{self.org}.{self.package}"
+            return f"{settings.NPYM_PREFIX}.{self.safe_org}.{self.safe_package}"
 
-        return f"npm.{self.package}"
+        return f"{settings.NPYM_PREFIX}.{self.safe_package}"
 
 
 def _norm_py_name(package_name: str) -> str:
@@ -189,7 +225,7 @@ class Npm:
                 if i == 0:
                     dedup_python_name = norm.py_name
                 else:
-                    dedup_python_name = f"{norm.py_name}.{i}"
+                    dedup_python_name = f"d{i}.{norm.py_name}"
 
                 to_add_real.append(
                     dict(
