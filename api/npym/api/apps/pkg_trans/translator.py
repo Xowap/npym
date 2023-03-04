@@ -561,11 +561,23 @@ class PackageTranslator:
         """
         All the content of the wheel has been laid out in the working folder,
         now we generate a full zip file containing all this.
+
+        Notes
+        -----
+        We're setting strict_timestamps=False because the range of allowed
+        times in a zip file is smaller than those allowed in tar files. This
+        might get some dates chopped up but it's better than failing. In the
+        future it might be worth to use one of the many Zip extensions to be
+        able to put correct timestamps and not just DOS crap.
         """
 
         with self.wheel_path.open("wb") as f:
             with zipfile.ZipFile(
-                f, "w", compresslevel=9, compression=zipfile.ZIP_DEFLATED
+                file=f,
+                mode="w",
+                compresslevel=9,
+                compression=zipfile.ZIP_DEFLATED,
+                strict_timestamps=False,
             ) as z:
                 for path in self.wheel_dir.glob("**/*"):
                     if path.is_file():
