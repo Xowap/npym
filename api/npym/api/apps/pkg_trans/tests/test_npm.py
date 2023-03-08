@@ -26,3 +26,13 @@ def test_make_norm_name(npm: Npm):
     assert npm._make_norm_name("foo/bar/baz42!!") == NormName(package="foo-bar-baz42")
     assert npm._make_norm_name("@foo/bar") == NormName(package="bar", org="foo")
     assert npm._make_norm_name("foo.bar") == NormName(package="foo-bar")
+
+
+def test_safe_py_name(npm: Npm):
+    assert (
+        npm._make_norm_name("@14islands/r3f-scroll-rig").py_name
+        == "npym.n14islands.r3f-scroll-rig"
+    )
+    assert npm._make_norm_name("@42/42").py_name == "npym.n42.n42"
+    assert npm._make_norm_name("@_/_").py_name == "npym.undefined.undefined"
+    assert npm._make_norm_name("42").py_name == "npym.n42"

@@ -10,7 +10,6 @@ import httpx
 import json_stream.httpx
 from django.conf import settings
 from packaging.version import Version as PyVersion
-from psqlextra.types import ConflictAction
 from semver import VersionInfo as SemVersion
 
 from .iter import ChunkIterator
@@ -18,6 +17,7 @@ from .models import Distribution
 
 PACKAGE_RE = re.compile(r"^(@(?P<org>[^/]+)/)?(?P<package>.+)$")
 PACKAGE_NON_CHAR = re.compile(r"[^a-zA-Z0-9]+")
+PACKAGE_NUMERIC_BITS = re.compile(r"(?P<prefix>^|-)(?P<number>[0-9])")
 
 logger = getLogger(__name__)
 
@@ -247,11 +247,14 @@ class Npm:
         names_index: MutableMapping[str, MutableMapping[str, bool]] = defaultdict(dict)
 
         conflicts_from_db = Distribution.objects.filter(
-            python_name_base__in=[searchable_py_name(d["python_name"]) for d in to_add]
+            python_name_base__in=[searchable_py_name(d["python_name"]) for d in to_add],
+            generated_for=None,
         ).order_by("dedup_seq")
+        present_names = set()
 
         for conflict in conflicts_from_db:
             names_index[conflict.python_name_base][conflict.js_name] = True
+            present_names.add(conflict.js_name)
 
         for distribution in to_add:
             names_index[searchable_py_name(distribution["python_name"])][
@@ -265,6 +268,9 @@ class Npm:
                 logger.debug(f"Found conflict for {python_name}: {list(js_names)}")
 
             for i, js_name in enumerate(js_names):
+                if js_name in present_names:
+                    continue
+
                 norm = self._make_norm_name(js_name)
 
                 if i == 0:
@@ -289,9 +295,7 @@ class Npm:
                     )
                 )
 
-        Distribution.objects.on_conflict(
-            ["js_name", "generated_for"], ConflictAction.NOTHING
-        ).bulk_insert(to_add_real)
+        Distribution.objects.bulk_insert(to_add_real)
 
     def import_names(self) -> None:
         """
