@@ -1,9 +1,13 @@
 from importlib import metadata
 
+import uvloop
 from model_w.env_manager import EnvManager
 from model_w.preset.django import ModelWDjango
 
 REST_FRAMEWORK = {}
+
+
+uvloop.install()
 
 
 def get_package_version() -> str:

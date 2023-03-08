@@ -336,12 +336,8 @@ class Bound:
 
     version: Ver
     inclusive: bool = True
-    change_index: int = 2
 
-    def __lt__(self, other):
-        if not isinstance(other, Bound):
-            raise NotImplementedError
-
+    def _lt_bound(self, other: "Bound") -> bool:
         if (
             self.version.__class__ is other.version.__class__
             and self.version == other.version
@@ -355,14 +351,40 @@ class Bound:
         else:
             return self.version < other.version
 
+    def _lt_version(self, other: SemVersion) -> bool:
+        if self.inclusive:
+            return self.version <= other
+        else:
+            return self.version < other
+
+    def __lt__(self, other):
+        if isinstance(other, Bound):
+            return self._lt_bound(other)
+        elif isinstance(other, SemVersion):
+            return self._lt_version(other)
+        else:
+            raise ValueError(f"Cannot compare {type(other)} to Bound")
+
     def __le__(self, other):
-        return self < other or self == other
+        if isinstance(other, SemVersion):
+            return self._lt_version(other)
+        else:
+            return self < other or self == other
 
     def __gt__(self, other):
-        return not self <= other
+        if isinstance(other, SemVersion):
+            if self.inclusive:
+                return self.version >= other
+            else:
+                return self.version > other
+        else:
+            return not self <= other
 
     def __ge__(self, other):
-        return not self < other
+        if isinstance(other, SemVersion):
+            return self > other
+        else:
+            return self > other or self == other
 
     def as_py_bound(self):
         """
@@ -378,44 +400,8 @@ class Bound:
             return PyBound(py, self.inclusive)
 
 
-@dataclass(frozen=True)
-class Range:
-    """
-    A range between two bounds. This object is essential to the way we compute
-    things in the sense that we transform every single partial into a range,
-    which then allows to make computations on the ranges (like merge them if
-    they intersect, apply different kind of conditions, etc).
-    """
-
-    min: Bound = Bound(MIN_VER)
-    max: Bound = Bound(MAX_VER)
-
-    def as_py_range(self):
-        return PyRange(self.min.as_py_bound(), self.max.as_py_bound())
-
-
-PyVer = Union[Sentinel, PyVersion]
-
-
-@dataclass(frozen=True)
-class PyBound:
-    """
-    Same as Bound but following Python conventions
-    """
-
-    version: PyVer
-    inclusive: bool = True
-
-
-@dataclass(frozen=True)
-class PyRange:
-    """
-    Same as Range but following Python conventions
-    """
-
-    min: PyBound = PyBound(MIN_VER)
-    max: PyBound = PyBound(MAX_VER)
-
+# noinspection PyUnresolvedReferences
+class RangeStrMixin:
     def __str__(self):
         """
         This is where we do the conversion to Python version specifiers. They
@@ -459,6 +445,55 @@ class PyRange:
                 return f">{self.min.version},<={self.max.version}"
             else:
                 return f">{self.min.version},<{self.max.version}"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self})"
+
+
+@dataclass(frozen=True, repr=False)
+class Range(RangeStrMixin):
+    """
+    A range between two bounds. This object is essential to the way we compute
+    things in the sense that we transform every single partial into a range,
+    which then allows to make computations on the ranges (like merge them if
+    they intersect, apply different kind of conditions, etc).
+    """
+
+    min: Bound = Bound(MIN_VER)
+    max: Bound = Bound(MAX_VER)
+
+    def as_py_range(self):
+        return PyRange(self.min.as_py_bound(), self.max.as_py_bound())
+
+    def contains(self, version: SemVersion) -> bool:
+        """
+        Check if a version is contained in this range
+        """
+
+        return self.min.__lt__(version) and self.max.__gt__(version)
+
+
+PyVer = Union[Sentinel, PyVersion]
+
+
+@dataclass(frozen=True)
+class PyBound:
+    """
+    Same as Bound but following Python conventions
+    """
+
+    version: PyVer
+    inclusive: bool = True
+
+
+@dataclass(frozen=True, repr=False)
+class PyRange(RangeStrMixin):
+    """
+    Same as Range but following Python conventions
+    """
+
+    min: PyBound = PyBound(MIN_VER)
+    max: PyBound = PyBound(MAX_VER)
 
 
 @dataclass(frozen=True)

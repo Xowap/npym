@@ -20,6 +20,7 @@ rich = "*"
 wheel-filename = "^1.4.1"
 semver = "^2.13.0"
 lark = "^1.1.5"
+uvloop = "^0.17.0"
 
 [tool.poetry.dev-dependencies]
 black = "*"

@@ -17,5 +17,5 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        npm = Npm()
+        npm = Npm.instance()
         npm.import_names()

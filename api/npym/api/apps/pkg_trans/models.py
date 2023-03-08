@@ -1,8 +1,20 @@
+from pathlib import Path
 from urllib.parse import quote
 from uuid import uuid4
 
 from django.db import models
+from django.utils.functional import cached_property
+from packaging.version import Version as PyVersion
 from psqlextra.models import PostgresModel
+
+
+def return_false():
+    """
+    Stupid callable so that JSONField doesn't emmit a warning about the default
+    parameter not being a callable.
+    """
+
+    return False
 
 
 class UuidPkModel(PostgresModel):
@@ -28,10 +40,14 @@ class Distribution(UuidPkModel):
     mapping to a Python distribution.
     """
 
+    class Meta:
+        unique_together = [
+            ("generated_for", "js_name"),
+        ]
+
     js_name = models.CharField(
         max_length=1000,
         help_text="The canonical NPM name of this package",
-        unique=True,
     )
     python_name = models.CharField(
         max_length=1000,
@@ -46,7 +62,7 @@ class Distribution(UuidPkModel):
     python_name_searchable = models.CharField(
         max_length=1000,
         help_text="The normalized Python name of this distribution, with dots replaced by dashes, so that the name is searchable",
-        db_index=True,
+        unique=True,
     )
     dedup_seq = models.IntegerField(
         help_text=(
@@ -55,10 +71,54 @@ class Distribution(UuidPkModel):
         )
     )
     description = models.TextField(blank=True, default="")
+    original = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        related_name="copies",
+        null=True,
+        help_text=(
+            "Copies are made in order to help with resolving conflicting "
+            "versions, since Python package managers don't deal with nested "
+            "versions like NPM."
+        ),
+    )
+    generated_for = models.ForeignKey(
+        "Version",
+        on_delete=models.CASCADE,
+        related_name="subtree",
+        null=True,
+        help_text=(
+            "Non-NULL values indicate that this distribution was generated for"
+            " a particular version of the package. We need to know that in "
+            "order to check the signature."
+        ),
+    )
+    dependencies = models.JSONField(
+        default=return_false,
+        blank=True,
+        help_text=(
+            "Pre-resolved dependencies of this package. False if the "
+            "resolution did not happen yet (meaning it needs to be done "
+            "before serving the package). Will be defined for tree leaves."
+        ),
+    )
+
+    def __str__(self):
+        return self.python_name
 
     @property
     def npm_url(self):
         return f"https://www.npmjs.com/package/{quote(self.js_name)}"
+
+    @property
+    def real(self):
+        """
+        Because some distributions are auto-generated sub-tree nodes, we need
+        a simple way to obtain the real distribution behind that one for some
+        metadata when generating the package.
+        """
+
+        return self.original or self
 
     def wheel_name(
         self,
@@ -88,6 +148,26 @@ class Version(UuidPkModel):
     )
     python_version = models.CharField(max_length=100)
     js_version = models.CharField(max_length=100)
+    dependencies = models.JSONField(
+        default=return_false,
+        blank=True,
+        help_text=(
+            "Pre-resolved dependencies of this package. False if the "
+            "resolution did not happen yet (meaning it needs to be done "
+            "before serving the package). Will be defined for tree roots."
+        ),
+    )
+
+    def __str__(self):
+        return f"{self.distribution}@{self.js_version}"
+
+    @cached_property
+    def parsed_py_version(self) -> PyVersion:
+        """
+        That's useful for things like sorting
+        """
+
+        return PyVersion(self.python_version)
 
 
 def upload_to_archive(instance: "Archive", _: str) -> str:
@@ -154,6 +234,9 @@ class Archive(UuidPkModel):
     )
     hash_sha256 = models.CharField(max_length=64)
     archive = models.FileField(upload_to=upload_to_archive)
+
+    def __str__(self):
+        return f"{Path(self.archive.path).name}"
 
 
 class Download(PostgresModel):

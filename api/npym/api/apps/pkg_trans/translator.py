@@ -13,6 +13,8 @@ from typing import Callable, Generic, Mapping, MutableMapping, Sequence, Tuple, 
 import httpx
 
 from .models import Distribution, Version
+from .npm import importable_py_name
+from .resolver import Resolver
 from .version_man import sem_range_to_py_range
 
 
@@ -312,28 +314,19 @@ class PackageTranslator:
         we got. If we can't find a package well too bad.
         """
 
-        base_dependencies = self.version_info.get("dependencies", {})
-        peer_dependencies = self.version_info.get("peerDependencies", {})
+        if self.version.distribution.original is None:
+            if self.version.dependencies is False:
+                resolver = Resolver(self.version)
+                resolver.resolve()
 
-        dependencies = {
-            **base_dependencies,
-            **peer_dependencies,
-        }
+            dependencies = self.version.dependencies
+        else:
+            dependencies = self.version.distribution.dependencies
 
-        out = {"npym": ">=0.0.0"}
-        name_map = {
-            d.js_name: d.python_name
-            for d in Distribution.objects.filter(js_name__in=dependencies)
-        }
+        if dependencies is False:
+            raise ValueError("Expected to find dependencies but didn't")
 
-        for name, version in dependencies.items():
-            if name in name_map:
-                try:
-                    out[name_map[name]] = sem_range_to_py_range(version)
-                except ValueError:
-                    out[name_map[name]] = ">=0.0.0"
-
-        return out
+        return {**dependencies, "npym": ">=0.0.0"}
 
     def _write_dist_info_metadata(self):
         """
@@ -358,8 +351,16 @@ class PackageTranslator:
 
             return bugs.get("url", "")
 
+        def get_repository():
+            repo = self.version_info.get("repository", {})
+
+            if isinstance(repo, str):
+                return repo
+
+            return repo.get("url", "")
+
         homepage = self.version_info.get("homepage", "")
-        repository = self.version_info.get("repository", {}).get("url", "")
+        repository = get_repository()
         author, author_email = get_author_info()
         keywords = self.version_info.get("keywords", [])
         description = self.version_info.get("description", "")
@@ -502,7 +503,7 @@ class PackageTranslator:
             return
 
         lines = [
-            f"from {self.distribution.python_name} import entrypoints",
+            f"from {importable_py_name(self.distribution.python_name)} import entrypoints",
             f"entrypoints.{[*entrypoints][0]}()",
         ]
 
@@ -528,7 +529,7 @@ class PackageTranslator:
 
         for entry in scripts.values():
             lines.append(
-                f"{entry.original}={self.distribution.python_name}:entrypoints.{entry.transformed}"
+                f"{entry.original}={importable_py_name(self.distribution.python_name)}:entrypoints.{entry.transformed}"
             )
 
         self._write_lines(self.dist_info_dir / "entry_points.txt", lines)
@@ -537,6 +538,9 @@ class PackageTranslator:
         """
         Umbrella call for all which pertains to bin and entrypoints
         """
+
+        if self.distribution.original is not None:
+            return
 
         self.py_module_dir.mkdir(parents=True, exist_ok=True)
         scripts, entrypoints = self._guess_entry_points()

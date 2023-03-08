@@ -1,3 +1,4 @@
+import hashlib
 import re
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -121,7 +122,7 @@ def _norm_py_name(package_name: str) -> str:
     return package_name
 
 
-def _searchable_py_name(package_name: str) -> str:
+def searchable_py_name(package_name: str) -> str:
     """
     In order to make a Python name searchable, we go through the normal
     normalization process but instead of having "-", "_" and "." as special
@@ -132,6 +133,22 @@ def _searchable_py_name(package_name: str) -> str:
     package_name = _norm_py_name(package_name)
     package_name = package_name.replace("_", "-")
     package_name = package_name.replace(".", "-")
+
+    return package_name
+
+
+def importable_py_name(package_name: str) -> str:
+    """
+    Transforms a Python distribution name into something that looks more like
+    a module name.
+
+    Parameters
+    ----------
+    package_name
+        Name of the Python distribution
+    """
+
+    package_name = package_name.replace("-", "_")
 
     return package_name
 
@@ -154,10 +171,28 @@ class Npm:
     Utility to access NPM data
     """
 
+    _instance = None
     NAMES_JSON = "https://raw.githubusercontent.com/nice-registry/all-the-package-names/master/names.json"
 
     def __init__(self):
         self.client = httpx.Client(base_url="https://registry.npmjs.org/")
+        self.async_client = None
+
+    @classmethod
+    def instance(cls):
+        if not cls._instance:
+            cls._instance = cls()
+
+        return cls._instance
+
+    def renew_async_client(self):
+        """
+        You can't have just one async client if you're going to change the
+        loop (which we are as we create a new loop every time we use the
+        client).
+        """
+
+        self.async_client = httpx.AsyncClient(base_url="https://registry.npmjs.org/")
 
     def get_package_info(self, package_name: str) -> PackageInfo:
         """
@@ -165,6 +200,16 @@ class Npm:
         """
 
         response = self.client.get(f"/{quote(package_name)}")
+        response.raise_for_status()
+
+        return response.json()
+
+    async def async_get_package_info(self, package_name: str) -> PackageInfo:
+        """
+        Retrieves the information about a specific package
+        """
+
+        response = await self.async_client.get(f"/{quote(package_name)}")
         response.raise_for_status()
 
         return response.json()
@@ -202,14 +247,14 @@ class Npm:
         names_index: MutableMapping[str, MutableMapping[str, bool]] = defaultdict(dict)
 
         conflicts_from_db = Distribution.objects.filter(
-            python_name_base__in=[_searchable_py_name(d["python_name"]) for d in to_add]
+            python_name_base__in=[searchable_py_name(d["python_name"]) for d in to_add]
         ).order_by("dedup_seq")
 
         for conflict in conflicts_from_db:
             names_index[conflict.python_name_base][conflict.js_name] = True
 
         for distribution in to_add:
-            names_index[_searchable_py_name(distribution["python_name"])][
+            names_index[searchable_py_name(distribution["python_name"])][
                 distribution["js_name"]
             ] = True
 
@@ -225,20 +270,27 @@ class Npm:
                 if i == 0:
                     dedup_python_name = norm.py_name
                 else:
-                    dedup_python_name = f"d{i}.{norm.py_name}"
+                    h = hashlib.sha256()
+                    h.update(f"{js_name}:{norm.py_name}:{i}".encode("utf-8"))
+                    d = f"x{h.hexdigest()[0:8]}"
+                    dedup_python_name = re.sub(
+                        rf"^({settings.NPYM_PREFIX}\.)?(.*)$",
+                        lambda m: f"{m.group(1)}{d}.{m.group(2)}",
+                        norm.py_name,
+                    )
 
                 to_add_real.append(
                     dict(
                         js_name=js_name,
                         python_name=dedup_python_name,
-                        python_name_base=_searchable_py_name(python_name),
-                        python_name_searchable=_searchable_py_name(dedup_python_name),
+                        python_name_base=searchable_py_name(python_name),
+                        python_name_searchable=searchable_py_name(dedup_python_name),
                         dedup_seq=i,
                     )
                 )
 
         Distribution.objects.on_conflict(
-            ["js_name"], ConflictAction.NOTHING
+            ["js_name", "generated_for"], ConflictAction.NOTHING
         ).bulk_insert(to_add_real)
 
     def import_names(self) -> None:

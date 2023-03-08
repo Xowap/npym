@@ -466,3 +466,18 @@ def test_sem_convert():
     assert sem_range_to_py_range("~1.2.3") == ">=1.2.3,<1.3.0"
     assert sem_range_to_py_range(">4") == ">=5.0.0"
     assert sem_range_to_py_range(">2 >4 <8 || 5.x") == ">=5.0.0,<8.0.0"
+
+
+def test_range_ver_compare():
+    assert parse_spec("1.0.0")[0].contains(SemVersion.parse("1.0.0"))
+    assert not parse_spec("1.0.0")[0].contains(SemVersion.parse("1.0.1"))
+
+    assert not parse_spec("1.x")[0].contains(SemVersion.parse("1.0.0-beta.1"))
+    assert parse_spec("1.x")[0].contains(SemVersion.parse("1.0.0"))
+    assert parse_spec("1.x")[0].contains(SemVersion.parse("1.2.0"))
+    assert not parse_spec("1.x")[0].contains(SemVersion.parse("2.0.0"))
+
+    assert not parse_spec("~1.2.3")[0].contains(SemVersion.parse("1.2.0"))
+    assert parse_spec("~1.2.3")[0].contains(SemVersion.parse("1.2.3"))
+    assert parse_spec("~1.2.3")[0].contains(SemVersion.parse("1.2.42"))
+    assert not parse_spec("~1.2.3")[0].contains(SemVersion.parse("1.3.0"))
